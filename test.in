@@ -1,0 +1,24 @@
+make int:a
+make int:b
+make int:sum
+
+//input//
+[
+    print::: _$ Enter two numbers $_
+    write::: a
+    write::: b
+]
+
+//solve//
+[
+    operation a,b,sum
+]
+
+a,copy
+b,equals?,sum
+
+//display//
+[
+    print::: _$ Sum is $_
+    print::: sum
+]
