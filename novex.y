@@ -26,7 +26,7 @@
 %token <num> NUMBER
 
 %token MAKE TYPE_INT PRINT WRITE OPERATION COPY EQUALS SUM MULT SUB
-%token COMMA LBRACKET RBRACKET
+%token COMMA LBRACKET RBRACKET Colon
 
 %start program
 
@@ -37,16 +37,16 @@ program:
     ;
 
 declarations:
-    /* empty */
+
     | declarations declaration   
     ;
 
 declaration:
-    MAKE TYPE_INT ':' IDENTIFIER        {printf("Declared variable: int %s\n", $4);}
+    MAKE TYPE_INT Colon IDENTIFIER        {printf("Declared variable: int %s\n", $4);}
     ;
 
 functions:
-    /* empty */
+    
     | functions function
     ;
 
@@ -55,7 +55,7 @@ function:
     ;
 
 statements:
-    /* empty */
+    
     | statements statement
     ;
 
@@ -64,8 +64,8 @@ statement:
     | PRINT IDENTIFIER                                  { printf("Print variable: %s\n", $2);}
     | WRITE IDENTIFIER                                  {printf("Write prompt for: %s\n", $2);}
     | OPERATION operands                                {printf("Operation executed.\n");}
-    | IDENTIFIER COMMA COPY                             {printf("Copy value into: %s\n", $1);}
     | IDENTIFIER COMMA EQUALS COMMA IDENTIFIER          {printf("Compare: %s == %s\n", $1, $5);}
+    | IDENTIFIER COMMA COPY COMMA IDENTIFIER                  {printf("Copy value into: %s of %s\n", $1,$5);}
     ;
 
 operands:

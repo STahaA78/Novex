@@ -1,6 +1,6 @@
 make int:a
 make int:b
-make int:sum
+make int:sum1
 
 //input//
 [
@@ -11,14 +11,15 @@ make int:sum
 
 //solve//
 [
-    operation a,b,sum
+    operation a,b,sum1
+    a,copy,b
+    b,equals?,sum1
 ]
 
-a,copy
-b,equals?,sum
+
 
 //display//
 [
     print::: _$ Sum is $_
-    print::: sum
+   
 ]
