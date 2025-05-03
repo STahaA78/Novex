@@ -73,8 +73,10 @@ operands:
     ;
 
 operand_list:
-    IDENTIFIER COMMA IDENTIFIER COMMA IDENTIFIER        {printf("Operands: %s, %s, %s\n", $1, $3, $5);}
-    | operand_list COMMA IDENTIFIER                     {printf("Additional operand: %s\n", $3);}
+    SUM COMMA IDENTIFIER  COMMA IDENTIFIER COMMA IDENTIFIER    {printf("Operands: %s = %s + %s\n", $3, $7, $5);}
+    |SUB COMMA  IDENTIFIER  COMMA IDENTIFIER COMMA IDENTIFIER       {printf("Operands: %s = %s - %s\n", $3, $7, $5);}
+    |MULT COMMA  IDENTIFIER COMMA IDENTIFIER COMMA IDENTIFIER       {printf("Operands: %s = %s * %s\n", $3, $7, $5);}
+    |operand_list COMMA IDENTIFIER                     {printf("Additional operand: %s\n", $3);}
     ;
 
 %%

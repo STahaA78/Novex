@@ -1,7 +1,8 @@
 make int:a
 make int:b
 make int:sum1
-
+make int:sub1
+make int:prod
 //input//
 [
     print::: _$ Enter two numbers $_
@@ -11,7 +12,9 @@ make int:sum1
 
 //solve//
 [
-    operation a,b,sum1
+    operation sum,sum1,b,a
+    operation sub,sub1,b,a
+    operation product,prod,b,a
     a,copy,b
     b,equals?,sum1
 ]
@@ -21,5 +24,5 @@ make int:sum1
 //display//
 [
     print::: _$ Sum is $_
-   
+    print::: sum1
 ]
