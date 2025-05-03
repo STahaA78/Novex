@@ -16,7 +16,7 @@ int yylex();
 "product"           { return MULT;}
 "copy"              { return COPY; }
 "equals?"           { return EQUALS; }
-
+\/\/"Main"\/\/      {return MAIN;}
 \/\/[a-zA-Z_][a-zA-Z0-9_]*\/\/ {yylval.str = strdup(yytext + 2); yylval.str[strlen(yylval.str) - 2] = '\0'; return FUNCTION_NAME;}
 
 "_$"[^$]*"$_" {

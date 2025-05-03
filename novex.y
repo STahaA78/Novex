@@ -25,7 +25,7 @@
 %token <str> IDENTIFIER FUNCTION_NAME STRING
 %token <num> NUMBER
 
-%token MAKE TYPE_INT PRINT WRITE OPERATION COPY EQUALS SUM MULT SUB
+%token MAKE TYPE_INT PRINT WRITE OPERATION COPY EQUALS SUM MULT SUB MAIN
 %token COMMA LBRACKET RBRACKET Colon
 
 %start program
@@ -33,7 +33,7 @@
 %%
 
 program:
-    declarations functions      {printf("Parsed complete program.\n");}
+    declarations functions mainfunc      {printf("Parsed complete program.\n");}
     ;
 
 declarations:
@@ -53,7 +53,8 @@ functions:
 function:
     FUNCTION_NAME LBRACKET statements RBRACKET      {printf("Parsed function block: %s\n", $1);}
     ;
-
+mainfunc:
+    MAIN LBRACKET statements RBRACKET               {printf("Main Fucntion!\n");}
 statements:
     
     | statements statement
