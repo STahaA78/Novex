@@ -1,0 +1,18 @@
+# Ignore compiled and generated parser files
+y.tab.c
+y.tab.h
+lex.yy.c
+
+# Ignore Novex source files if you don't want them in the repo
+*.novex
+
+# Optional: object files and binaries
+*.o
+*.out
+novex  # If your binary is named 'novex'
+
+# Optional: editor/IDE junk
+*~
+*.swp
+.DS_Store
+.vscode/

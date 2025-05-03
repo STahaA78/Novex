@@ -5,24 +5,23 @@ make int:sub1
 make int:prod
 //input//
 [
-    a=10
-    b=a
-    print::: _$ Enter two numbers $_
-    write::: a
+    print::: _$ Enter two numbers $_    
+    write::: a          
     write::: b
 ]
 
 //solve//
 [
-    operation sum,sum1,b,a
+    operation sum,sum1,b,a 
     print:::sum1
-    operation sub,sub1,a,b
+    operation sub,sub1,a,b 
     print:::sub1
     operation product,prod,b,a
     print:::prod
     a,copy,prod
     print:::a
-    b,equals?,sum1
+    a,b,equals?,sum1
+    print:::a
 ]
 
 

@@ -67,10 +67,17 @@ statement:
                                                         scanf("%d", &num1);
                                                         vartable.defineVariable($2, num1);}
     | OPERATION operands                                {printf("Operation executed.\n");}
-    | IDENTIFIER COMMA EQUALS COMMA IDENTIFIER          {printf("Compare: %s == %s\n", $1, $5);}
+    | IDENTIFIER COMMA IDENTIFIER COMMA EQUALS COMMA IDENTIFIER          {if(vartable.getVariableValue($3)==vartable.getVariableValue($7))
+                                                                            {
+                                                                                vartable.defineVariable($1,1);
+                                                                            }
+                                                                            else{
+                                                                                vartable.defineVariable($1,0);
+                                                                            }
+    
+                                                                         }
     | IDENTIFIER COMMA COPY COMMA IDENTIFIER            {vartable.defineVariable($1,vartable.getVariableValue($5));}
-    | IDENTIFIER ASSIGN IDENTIFIER                      {vartable.defineVariable($1,vartable.getVariableValue($3));}
-    | IDENTIFIER ASSIGN NUMBER                          {vartable.defineVariable($1,$3);}
+    | IDENTIFIER COMMA COPY COMMA NUMBER                {vartable.defineVariable($1,$5);}
     ;
 
 operands:
