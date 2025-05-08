@@ -1,44 +1,98 @@
+// SymbolTable.cpp
 #include "symbol_table.h"
-
-void SymbolTable::declareVariable(const std::string& name, const std::string& type) {
-    if (table.count(name)) {
-        std::cerr << "Error: Variable '" << name << "' already declared\n";
-        return;
+#include "IR.h"
+#include <llvm/IR/IRBuilder.h>
+void SymbolTable::enterScope()
+{
+    SymbolTableStack.push({});
+}
+void SymbolTable::exitScope()
+{
+    if (!SymbolTableStack.empty())
+    {
+        SymbolTableStack.pop();
     }
-    table[name] = {type, 0, false};
 }
+llvm::Value *SymbolTable::lookupSymbol(const std::string &id, llvm::Value *index)
+{
+    auto scopes = SymbolTableStack;
+    while (!scopes.empty())
+    {
+        auto &scope = scopes.top();
+        auto it = scope.find(id);
+        if (it != scope.end())
+        {
+            if (index == nullptr)
+            {
+                return it->second.value;
+            }
 
-void SymbolTable::defineVariable(const std::string& name, int value) {
-    if (!table.count(name)) {
-        std::cerr << "Error: Variable '" << name << "' not declared\n";
-        return;
+            if (it->second.isArray)
+            {
+                llvm::Value *zero = llvm::ConstantInt::get(builder.getInt32Ty(), 0);
+
+                // Step 1: Adjust index if array startIndex != 0
+                if (it->second.startIndex != 0)
+                {
+                    llvm::Value *startIdx = llvm::ConstantInt::get(builder.getInt32Ty(), it->second.startIndex);
+                    index = builder.CreateSub(index, startIdx, id + "_adjusted_index");
+                }
+
+                // Step 2: Calculate GEP
+                Value *ptr = builder.CreateGEP(
+                    it->second.type, // array type [size x element]
+                    it->second.value,
+                    {zero, index});
+
+                return ptr;
+            }
+            else
+            {
+                return nullptr;
+            }
+        }
+        scopes.pop();
     }
-    table[name].value = value;
-    table[name].isDefined = true;
+    return nullptr; // Not found
 }
-
-bool SymbolTable::isDeclared(const std::string& name) const {
-    return table.count(name);
-}
-
-bool SymbolTable::isDefined(const std::string& name) const {
-    auto it = table.find(name);
-    return it != table.end() && it->second.isDefined;
-}
-
-int SymbolTable::getVariableValue(const std::string& name) const {
-    auto it = table.find(name);
-    if (it == table.end() || !it->second.isDefined) {
-        std::cerr << "Error: Variable '" << name << "' is not defined\n";
-        return 0;
+llvm::Type *SymbolTable::getSymbolType(const std::string &id)
+{
+    auto scopes = SymbolTableStack;
+    while (!scopes.empty())
+    {
+        auto &scope = scopes.top();
+        auto it = scope.find(id);
+        if (it != scope.end())
+            return it->second.type; // Access the 'type' member of SymbolEntry
+        scopes.pop();
     }
-    return it->second.value;
+    return nullptr; // Return nullptr if the symbol is not found
 }
-
-void SymbolTable::print() const {
-    std::cout << "\n--- Symbol Table ---\n";
-    for (const auto& [name, info] : table) {
-        std::cout << name << " (" << info.type << ") = " << info.value
-                  << " [" << (info.isDefined ? "defined" : "declared") << "]\n";
+void SymbolTable::setSymbol(const std::string &id, llvm::Value *value, llvm::Type *type, bool isArray, int startIndex, int endIndex)
+{
+    // Set the symbol in the current scope with its value and type
+    if (!SymbolTableStack.empty())
+    {
+        // Store the symbol as a SymbolEntry with Value and Type
+        SymbolTableStack.top()[id] = {value, type, isArray, startIndex, endIndex};
     }
+}
+llvm::Value *SymbolTable::createNewSymbol(const std::string &id, llvm::Type *type, bool isArray, int startIndex, int endIndex)
+{
+    if (!SymbolTableStack.empty() && SymbolTableStack.top().find(id) != SymbolTableStack.top().end())
+    {
+        return nullptr;
+    }
+
+    llvm::Type *allocType = type;
+    if (isArray)
+    {
+        allocType = llvm::ArrayType::get(type, endIndex - startIndex + 1);
+    }
+
+    llvm::Value *alloca = builder.CreateAlloca(allocType, nullptr, id);
+
+    SymbolTableStack.top()[id] = {alloca, allocType, isArray, startIndex, endIndex};
+
+    return alloca;
 }

@@ -1,36 +1,59 @@
 %{
-#include "y.tab.h"
+#include "novex.tab.h"
 #include <string.h>
-int yylex();
+
+extern void yyerror(const char *msg);
+extern int yylineno;
 %}
+
+%option yylineno
+%option noyywrap
 
 %%
 
+"#"[^#]*"#"               {;}
 "make"              { return MAKE; }
+"local"             {return LOCAL;}
 "int"               { return TYPE_INT; }
+"str"               {return TYPE_STR;}
 "print:::"          { return PRINT; }
-"write:::"          { return WRITE; }
+"read:::"          { return READ; }
 "operation"         { return OPERATION; }
 "sum"               { return SUM;}
 "sub"               { return SUB;}
 "product"           { return MULT;}
+"div"               {return DIV;}
 "copy"              { return COPY; }
 "equals?"           { return EQUALS; }
-"="                 {return ASSIGN;}
-\/\/"Main"\/\/      {return MAIN;}
-\/\/[a-zA-Z_][a-zA-Z0-9_]*\/\/ {yylval.str = strdup(yytext + 2); yylval.str[strlen(yylval.str) - 2] = '\0'; return FUNCTION_NAME;}
+"gt"                {return GT;}
+"lt"                {return LT;}
+"gte"               {return GTE;}
+"lte"               {return LTE;}
+"if"                {return IF;}
+"else"              {return ELSE;}
+"and"               {return AND;}
+"or"                {return OR;}
+"not"               {return NOT;}
+"run"               {return RUN;}
+"for"               {return FOR;}
+"go"                {return GO;}
+"++"                {return INCREMENT;}
 
+\/\/"main"\/\/      {return MAIN;}
+\/\/[a-zA-Z_][a-zA-Z0-9_]*\/\/ {yylval.string_literal = strdup(yytext + 2); yylval.string_literal[strlen(yylval.string_literal) - 2] = '\0'; return FUNCTION_NAME;}
+
+
+
+[a-zA-Z_][a-zA-Z0-9_]* { yylval.identifier = strdup(yytext); return IDENTIFIER; }
+[0-9]+              { yylval.integer_literal = atoi(yytext); return NUMBER; }
 "_$"[^$]*"$_" {
-    yylval.str = strdup(yytext+2);
-    yylval.str[strlen(yylval.str) - 2] = '\0';
+    yylval.string_literal = strdup(yytext+2);
+    yylval.string_literal[strlen(yylval.string_literal) - 2] = '\0';
     return STRING;
 }
 
-
-[0-9]+              { yylval.num = atoi(yytext); return NUMBER; }
-[a-zA-Z_][a-zA-Z0-9_]* { yylval.str = strdup(yytext); return IDENTIFIER; }
-
-":"                 {return Colon;}
+"."                 {return DOT;}
+":"                 {return COLON;}
 ","                 { return COMMA; }
 "["                 { return LBRACKET; }
 "]"                 { return RBRACKET; }
@@ -39,4 +62,3 @@ int yylex();
 .                   { return yytext[0]; }
 
 %%
-int yywrap (void) {return 1;}
